@@ -1,11 +1,18 @@
 const MAX_HEALTH = 1000
 const STARTING_LEVEL = 1
 const BASE_POWER = 100
+const types = ['melee', 'ranged']
 
 class Char {
-  constructor () {
+  constructor (type, position = 1) {
+    if(!types.includes(type)){
+      throw new Error("Invalid character type.")
+    }
+
     this.health = MAX_HEALTH
     this.level = STARTING_LEVEL
+    this.type = type
+    this.position = position
   }
 
   get isAlive() {
@@ -13,6 +20,9 @@ class Char {
   }
   attack(target) {
     if (target === this) throw new Error('Cannot deal damage to itself')
+    let distance = this.getDistance(target)  
+    if (this.type === 'melee' && distance > 2) throw new Error('Melee cannot attack other with a distance above 2 meters')
+    if (this.type === 'ranged' && distance > 20) throw new Error('rANGED cannot attack other with a distance above 20 meters')
     let power = this.getPower(target)
     target.health = Math.max(0, target.health - power) 
   }
@@ -28,6 +38,10 @@ class Char {
     if (target.level - this.level >= 5) modifier = 0.5
     if (this.level - target.level >= 5) modifier = 1.5
     return modifier * BASE_POWER 
+  }
+
+  getDistance(target){
+    return Math.abs(this.position - target.position)
   }
   
   levelUp() {

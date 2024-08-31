@@ -5,8 +5,8 @@ describe('Char', () => {
   let charB
   
   beforeEach(() => {
-    charA = new Char()
-    charB = new Char()
+    charA = new Char('melee')
+    charB = new Char('melee')
   })
 
   describe('All Characters when created, have ...', () => {
@@ -52,6 +52,19 @@ describe('Char', () => {
       expect(charB.level).toBe(1)
       expect(charB.health).toBe(850)
     })
+    it('melee fighters cannot attack with target is more than 2 meters', () => {
+      charA = new Char('melee', 1)
+      charB = new Char('melee', 4)
+
+      expect(() => charA.attack(charB)).toThrow()
+    })
+    it('ranged fighters cannot attack with target is more than 20 meters', () => {
+      charA = new Char('ranged', 1)
+      charB = new Char('melee', 22)
+
+      expect(() => charA.attack(charB)).toThrow()
+    })
+
 
   })
 
