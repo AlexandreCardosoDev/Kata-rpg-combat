@@ -65,7 +65,11 @@ describe('Char', () => {
       expect(() => charA.attack(charB)).toThrow()
     })
 
-
+    it('Allies cannot Deal Damage to one another', () => {
+      charA.joinFaction('fac_1')
+      charB.joinFaction('fac_1')
+      expect(() => charA.attack(charB)).toThrow()
+    })
   })
 
   describe('A Character can Heal a Character', () => {
@@ -79,11 +83,62 @@ describe('Char', () => {
       repeat(() => charA.heal(charA), 10)
       expect(charA.health).toBe(1000)
     })
-    it('A Character can only Heal itself.', () => {
+    it('A Character can Heal itself.', () => {
+      charB.attack(charA)
+      charA.heal()
+      expect(charA.health).toBe(1000)
+    })
+    it('A Character cannot Heal others.', () => {
       expect(() => charA.heal(charB)).toThrow()
+    })
+    it('A Character can Heal Allies.', () => {
+      charA.attack(charB)
+      charA.joinFaction('fac_1')
+      charB.joinFaction('fac_1')
+      charA.heal(charB)
+      expect(charB.health).toBe(1000)
     })
   })
   
+  describe('A Character can belong to one or more Factions', () => {
+    it("Newly characters don't have factions", () => {
+      expect(charA.factions.size).toBe(0)
+    })
+
+    it("Characters can join factions", () => {
+      charA.joinFaction('fac_1')
+      charA.joinFaction('fac_1')
+      expect(charA.factions.size).toBe(1)
+      charA.joinFaction('fac_2')
+    })
+
+    it("Characters can join one or more factions", () => {
+      charA.joinFaction('fac_1')
+      charA.joinFaction('fac_2')
+      expect(charA.factions.size).toBe(2)
+    })
+
+    it("Characters can join one or leave factions", () => {
+      charA.joinFaction('fac_1')
+      charA.joinFaction('fac_2')
+      charA.leaveFaction('fac_2')
+      expect(charA.factions.size).toBe(1)
+    })
+
+    it("Characters can be allies if both are in the same faction", () => {
+      charA.joinFaction('fac_1')
+      charB.joinFaction('fac_1')
+      expect(charA.isAllied(charB)).toBe(true)
+    })
+
+    it("Characters are enemies if both are in different faction", () => {
+      charA.joinFaction('fac_1')
+      charB.joinFaction('fac_2')
+      expect(charA.isAllied(charB)).toBe(false)
+    })
+
+    
+  })
   
 
   function repeat(action, times) {

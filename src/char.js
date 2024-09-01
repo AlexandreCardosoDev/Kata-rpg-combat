@@ -13,22 +13,26 @@ class Char {
     this.level = STARTING_LEVEL
     this.type = type
     this.position = position
+    this.factions = new Set()
   }
 
   get isAlive() {
     return this.health > 0 
   }
+
   attack(target) {
     if (target === this) throw new Error('Cannot deal damage to itself')
     let distance = this.getDistance(target)  
     if (this.type === 'melee' && distance > 2) throw new Error('Melee cannot attack other with a distance above 2 meters')
     if (this.type === 'ranged' && distance > 20) throw new Error('rANGED cannot attack other with a distance above 20 meters')
+    if (this.isAllied(target)) throw new Error('Cannot attack an ally')
     let power = this.getPower(target)
     target.health = Math.max(0, target.health - power) 
   }
 
-  heal(target) {
-    if (target !== this) throw new Error('Cannot heal others')
+  heal(target = null) {
+    if (target === null) target = this
+    if (target !== this && !this.isAllied(target)) throw new Error('Cannot heal others')
     if (!target.isAlive) return
     target.health = Math.min(1000, target.health + 100) 
   }
@@ -46,6 +50,18 @@ class Char {
   
   levelUp() {
     this.level += 1
+  }
+
+  joinFaction(faction) {
+    this.factions.add(faction)
+  }
+
+  leaveFaction(faction) {
+    this.factions.delete(faction)
+  }
+
+  isAllied(target) {
+    return [...this.factions].some(faction => target.factions.has(faction))
   }
 
   
