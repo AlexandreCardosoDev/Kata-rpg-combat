@@ -21,17 +21,32 @@ class Char {
   }
 
   attack(target) {
+    if (target instanceof Char) {
+      this.attackChar(target)
+    } else {
+      this.attackProp(target)
+    }
+     
+  }
+
+  attackChar(target) {
     if (target === this) throw new Error('Cannot deal damage to itself')
     let distance = this.getDistance(target)  
     if (this.type === 'melee' && distance > 2) throw new Error('Melee cannot attack other with a distance above 2 meters')
-    if (this.type === 'ranged' && distance > 20) throw new Error('rANGED cannot attack other with a distance above 20 meters')
+    if (this.type === 'ranged' && distance > 20) throw new Error('Ranged cannot attack other with a distance above 20 meters')
     if (this.isAllied(target)) throw new Error('Cannot attack an ally')
     let power = this.getPower(target)
-    target.health = Math.max(0, target.health - power) 
+    target.health = Math.max(0, target.health - power)
   }
+
+  attackProp(target) {
+    target.takeDamage(BASE_POWER)
+  }
+
 
   heal(target = null) {
     if (target === null) target = this
+    if (!(target instanceof Char)) throw new Error('Cannot heal props')
     if (target !== this && !this.isAllied(target)) throw new Error('Cannot heal others')
     if (!target.isAlive) return
     target.health = Math.min(1000, target.health + 100) 

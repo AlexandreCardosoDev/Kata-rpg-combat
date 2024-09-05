@@ -1,4 +1,5 @@
 const Char = require('../src/char')
+const Prop = require('../src/prop')
 
 describe('Char', () => {
   let charA
@@ -18,6 +19,9 @@ describe('Char', () => {
     })
     it('starting status Alive', () => {
       expect(charA.isAlive).toBe(true)
+    })
+    it('starting with a class', () => {
+      expect(() => {let char = new Char()}).toThrow()
     })
   })
 
@@ -136,6 +140,29 @@ describe('Char', () => {
       charB.joinFaction('fac_2')
       expect(charA.isAllied(charB)).toBe(false)
     })
+
+    describe('Char leveling', () => {
+      it('levels up by 1', () => {
+        charA.levelUp()
+        expect(charA.level).toBe(2)
+      })
+    })
+
+    describe('Iteraction with props', () => {
+      let tree
+      beforeEach(() => {
+        tree = new Prop(1000)
+      })
+      it('can deal damage to props', () => {
+        charA.attack(tree)
+        expect(tree.health).toBe(900)
+      })
+      it('cannot heal a tree', () => {
+        expect(() => charA.heal(tree)).toThrow()
+      })
+    })
+    
+    
 
     
   })
